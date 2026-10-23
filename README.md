@@ -35,7 +35,48 @@ TailorTrack/
 
 ## Setup
 
-Setup steps, demo accounts and seed data instructions will be added as the project is built.
+You need Node.js 18+ and MongoDB running locally.
+
+### Backend
+
+```
+cd server
+npm install
+cp .env.example .env
+npm run seed
+npm run dev
+```
+
+The API runs on `http://localhost:5000/api`.
+
+### Demo accounts
+
+| Role  | Username | Password |
+|-------|----------|----------|
+| Owner | owner    | owner123 |
+| Staff | ali      | staff123 |
+| Staff | sara     | staff123 |
+
+### API overview
+
+| Method | Route | Who |
+|--------|-------|-----|
+| POST | /api/auth/login, /api/auth/logout | everyone |
+| GET | /api/auth/me | logged in |
+| GET, POST | /api/customers | owner |
+| GET, PUT, DELETE | /api/customers/:id | owner |
+| GET | /api/orders | owner (all), staff (assigned only) |
+| POST | /api/orders | owner |
+| GET | /api/orders/:id | owner, assigned staff |
+| PUT, DELETE | /api/orders/:id | owner |
+| PATCH | /api/orders/:id/status | owner, assigned staff (up to Ready) |
+| POST | /api/orders/:id/payments | owner |
+| POST | /api/orders/:id/photo | owner |
+| GET | /api/orders/:id/photo | owner, assigned staff |
+| GET | /api/dashboard | logged in |
+| GET, POST | /api/users/staff | owner |
+| PUT | /api/users/staff/:id | owner |
+| GET | /api/users/staff/summary | owner |
 
 ## Team
 
