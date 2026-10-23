@@ -2,6 +2,7 @@ const Order = require("../models/Order");
 const Customer = require("../models/Customer");
 const User = require("../models/User");
 const catchAsync = require("../utils/catchAsync");
+const { removeFile } = require("./photoController");
 
 const nextStatus = {
   Pending: ["In progress"],
@@ -191,6 +192,7 @@ const deleteOrder = catchAsync(async (req, res) => {
   }
 
   await order.deleteOne();
+  removeFile(order.photo && order.photo.filename);
   res.json({ message: "Order deleted" });
 });
 

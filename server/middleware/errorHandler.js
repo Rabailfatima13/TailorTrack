@@ -16,6 +16,11 @@ function errorHandler(err, req, res, next) {
     message = "Invalid id";
   }
 
+  if (err.code === "LIMIT_FILE_SIZE") {
+    status = 400;
+    message = "Image must be smaller than 2 MB";
+  }
+
   if (err.code === 11000) {
     status = 400;
     message = "This value already exists";
