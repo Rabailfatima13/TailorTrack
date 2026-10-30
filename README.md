@@ -22,7 +22,7 @@ orders, and staff update the orders assigned to them.
 | Frontend | React + TypeScript (Vite), Redux, Tailwind CSS |
 | Backend  | Node.js, Express (REST API)                  |
 | Database | MongoDB (Mongoose)                           |
-| Auth     | Token-based login                            |
+| Auth     | JWT stored in an httpOnly cookie             |
 
 ## Project structure
 
@@ -48,6 +48,18 @@ npm run dev
 ```
 
 The API runs on `http://localhost:5000/api`.
+
+### Frontend
+
+Open a second terminal while the backend is running:
+
+```
+cd client
+npm install
+npm run dev
+```
+
+Open `http://localhost:5173` in the browser. Requests to `/api` are forwarded to the backend by Vite, so the login cookie works without extra setup.
 
 ### Demo accounts
 
