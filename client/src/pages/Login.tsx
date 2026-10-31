@@ -8,6 +8,7 @@ function Login() {
   const { user, loading, error } = useAppSelector((state) => state.auth);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [formError, setFormError] = useState("");
 
   if (user) return <Navigate to="/" replace />;
@@ -41,12 +42,21 @@ function Login() {
         />
 
         <label className="mb-1 block text-sm font-medium">Password</label>
-        <input
-          type="password"
-          className="input mb-6"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+        <div className="relative mb-6">
+          <input
+            type={showPassword ? "text" : "password"}
+            className="input pr-16"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-sm text-indigo-600"
+          >
+            {showPassword ? "Hide" : "Show"}
+          </button>
+        </div>
 
         <button type="submit" className="btn w-full" disabled={loading}>
           {loading ? "Signing in..." : "Sign in"}
