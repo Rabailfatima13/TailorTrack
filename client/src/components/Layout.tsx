@@ -13,15 +13,17 @@ function Layout() {
   }
 
   const linkClass = ({ isActive }: { isActive: boolean }) =>
-    isActive ? "font-semibold text-indigo-700" : "text-gray-600 hover:text-indigo-700";
+    isActive
+      ? "rounded-full bg-blush-100 px-3 py-1 font-medium text-blush-600"
+      : "rounded-full px-3 py-1 text-slate-500 hover:bg-powder-50 hover:text-powder-600";
 
   return (
     <div className="min-h-screen">
-      <header className="no-print border-b bg-white">
+      <header className="no-print border-b border-blush-100 bg-white/80 backdrop-blur">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3">
           <div className="flex items-center gap-6">
-            <span className="text-xl font-bold text-indigo-700">TailorTrack</span>
-            <nav className="flex gap-4 text-sm">
+            <span className="text-xl font-bold text-blush-500">TailorTrack</span>
+            <nav className="flex gap-2 text-sm">
               <NavLink to="/" end className={linkClass}>
                 Dashboard
               </NavLink>
@@ -30,9 +32,15 @@ function Layout() {
 
           <div className="flex items-center gap-3 text-sm">
             <span>
-              {user?.name} <span className="text-gray-400">({user?.role})</span>
+              {user?.name}{" "}
+              <span className="rounded-full bg-powder-100 px-2 py-0.5 text-xs capitalize text-powder-600">
+                {user?.role}
+              </span>
             </span>
-            <button onClick={handleLogout} className="rounded border px-3 py-1 hover:bg-gray-100">
+            <button
+              onClick={handleLogout}
+              className="rounded-full border border-blush-200 px-3 py-1 text-blush-600 hover:bg-blush-50"
+            >
               Logout
             </button>
           </div>

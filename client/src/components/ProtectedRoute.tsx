@@ -12,7 +12,7 @@ function ProtectedRoute({ children, role }: Props) {
   const { user, checked } = useAppSelector((state) => state.auth);
 
   if (!checked) {
-    return <p className="p-6 text-center text-gray-500">Loading...</p>;
+    return <p className="p-6 text-center text-slate-500">Loading...</p>;
   }
 
   if (!user) return <Navigate to="/login" replace />;
