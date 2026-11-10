@@ -6,6 +6,7 @@ import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
+import Customers from "./pages/Customers";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -26,6 +27,14 @@ function App() {
         }
       >
         <Route index element={<Dashboard />} />
+        <Route
+          path="customers"
+          element={
+            <ProtectedRoute role="owner">
+              <Customers />
+            </ProtectedRoute>
+          }
+        />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
