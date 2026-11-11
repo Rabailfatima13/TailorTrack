@@ -1,17 +1,6 @@
 import { useState, type FormEvent } from "react";
 import api, { getErrorMessage } from "../api/axios";
-import type { Measurements } from "../types";
-
-const measurementFields: { key: keyof Measurements; label: string }[] = [
-  { key: "chest", label: "Chest" },
-  { key: "waist", label: "Waist" },
-  { key: "hips", label: "Hips" },
-  { key: "shoulder", label: "Shoulder" },
-  { key: "sleeve", label: "Sleeve" },
-  { key: "neck", label: "Neck" },
-  { key: "length", label: "Length" },
-  { key: "trouserLength", label: "Trouser length" },
-];
+import { measurementFields } from "../measurements";
 
 interface Props {
   onSaved: () => void;

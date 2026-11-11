@@ -8,6 +8,7 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Customers from "./pages/Customers";
 import Orders from "./pages/Orders";
+import NewOrder from "./pages/NewOrder";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -29,6 +30,14 @@ function App() {
       >
         <Route index element={<Dashboard />} />
         <Route path="orders" element={<Orders />} />
+        <Route
+          path="orders/new"
+          element={
+            <ProtectedRoute role="owner">
+              <NewOrder />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="customers"
           element={

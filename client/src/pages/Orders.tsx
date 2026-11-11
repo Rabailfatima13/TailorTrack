@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import api, { getErrorMessage } from "../api/axios";
 import StatusBadge from "../components/StatusBadge";
 import { useAppSelector } from "../store";
@@ -9,6 +10,8 @@ const statuses = ["Pending", "In progress", "Ready", "Delivered"];
 function Orders() {
   const user = useAppSelector((state) => state.auth.user);
   const isOwner = user?.role === "owner";
+  const location = useLocation();
+  const [message] = useState(location.state?.message);
 
   const [orders, setOrders] = useState<Order[]>([]);
   const [staffList, setStaffList] = useState<User[]>([]);
@@ -19,6 +22,10 @@ function Orders() {
   const [overdue, setOverdue] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (location.state) window.history.replaceState({}, "");
+  }, []);
 
   useEffect(() => {
     if (isOwner) {
@@ -46,7 +53,16 @@ function Orders() {
 
   return (
     <div>
-      <h1 className="mb-5 text-2xl font-semibold">{isOwner ? "Orders" : "My Orders"}</h1>
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-2xl font-semibold">{isOwner ? "Orders" : "My Orders"}</h1>
+        {isOwner && (
+          <Link to="/orders/new" className="btn">
+            + New order
+          </Link>
+        )}
+      </div>
+
+      {message && <p className="mb-4 rounded-xl bg-green-50 p-2 text-sm text-green-600">{message}</p>}
 
       <div className="card mb-5 flex flex-wrap items-end gap-4 p-4">
         <div>
