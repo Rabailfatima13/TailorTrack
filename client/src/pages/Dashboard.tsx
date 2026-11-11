@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import api, { getErrorMessage } from "../api/axios";
 import { useAppSelector } from "../store";
+import StatusBadge from "../components/StatusBadge";
 import type { DashboardData } from "../types";
 
 function StatCard({ label, value, style }: { label: string; value: number; style: string }) {
@@ -11,13 +12,6 @@ function StatCard({ label, value, style }: { label: string; value: number; style
     </div>
   );
 }
-
-const statusStyle: Record<string, string> = {
-  Pending: "bg-slate-100 text-slate-600",
-  "In progress": "bg-powder-100 text-powder-600",
-  Ready: "bg-blush-100 text-blush-600",
-  Delivered: "bg-green-50 text-green-600",
-};
 
 function Dashboard() {
   const user = useAppSelector((state) => state.auth.user);
@@ -75,9 +69,7 @@ function Dashboard() {
                       <td className="px-4 py-3">{order.assignedTo.name}</td>
                       <td className="px-4 py-3">{new Date(order.dueDate).toLocaleDateString()}</td>
                       <td className="px-4 py-3">
-                        <span className={`rounded-full px-2.5 py-1 text-xs ${statusStyle[order.status]}`}>
-                          {order.status}
-                        </span>
+                        <StatusBadge status={order.status} />
                       </td>
                     </tr>
                   ))}
