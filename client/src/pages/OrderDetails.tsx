@@ -29,6 +29,7 @@ function OrderDetails() {
   const [amount, setAmount] = useState("");
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
+  const [photo, setPhoto] = useState<File | null>(null);
 
   async function loadOrder() {
     try {
@@ -63,6 +64,7 @@ function OrderDetails() {
   async function addPayment(e: FormEvent) {
     e.preventDefault();
     if (!order) return;
+    setSuccess("");
 
     const value = Number(amount);
     if (!value || value <= 0) {
@@ -82,6 +84,41 @@ function OrderDetails() {
       setAmount("");
       setNote("");
       setSuccess("Payment recorded");
+      await loadOrder();
+    } catch (err) {
+      setError(getErrorMessage(err));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function uploadPhoto(e: FormEvent) {
+    e.preventDefault();
+    setSuccess("");
+    if (!photo) {
+      setError("Please choose an image first");
+      return;
+    }
+    if (!["image/jpeg", "image/png", "image/webp"].includes(photo.type)) {
+      setError("Only JPG, PNG or WEBP images are allowed");
+      return;
+    }
+    if (photo.size > 2 * 1024 * 1024) {
+      setError("Image must be smaller than 2 MB");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("photo", photo);
+
+    setBusy(true);
+    setError("");
+    setSuccess("");
+    try {
+      await api.post(`/orders/${id}/photo`, formData);
+      setPhoto(null);
+      (e.target as HTMLFormElement).reset();
+      setSuccess("Photo uploaded");
       await loadOrder();
     } catch (err) {
       setError(getErrorMessage(err));
@@ -113,9 +150,17 @@ function OrderDetails() {
           <h1 className="text-2xl font-semibold">{order.garmentType}</h1>
           <p className="text-sm text-slate-500">Order placed on {formatDate(order.createdAt)}</p>
         </div>
-        <Link to="/orders" className="no-print text-sm text-powder-600 hover:underline">
-          Back to orders
-        </Link>
+        <div className="no-print flex items-center gap-4">
+          <button
+            onClick={() => window.print()}
+            className="rounded-xl border border-powder-200 px-4 py-2 text-sm text-powder-600 hover:bg-powder-50"
+          >
+            Print summary
+          </button>
+          <Link to="/orders" className="text-sm text-powder-600 hover:underline">
+            Back to orders
+          </Link>
+        </div>
       </div>
 
       {success && <p className="no-print mb-4 rounded-xl bg-green-50 p-2 text-sm text-green-600">{success}</p>}
@@ -163,6 +208,36 @@ function OrderDetails() {
                   </div>
                 ))}
               </div>
+            )}
+          </div>
+
+          <div className="card p-5">
+            <h2 className="mb-3 font-semibold text-powder-600">Garment photo</h2>
+            {order.photo?.filename ? (
+              <img
+                src={`/api/orders/${order._id}/photo?v=${order.updatedAt}`}
+                alt="Garment reference"
+                className="max-h-72 rounded-xl border border-blush-100 object-contain"
+              />
+            ) : (
+              <p className="text-sm text-slate-500">No photo uploaded yet.</p>
+            )}
+
+            {isOwner && (
+              <form onSubmit={uploadPhoto} className="no-print mt-4">
+                <div className="flex flex-wrap items-center gap-3">
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={(e) => setPhoto(e.target.files?.[0] || null)}
+                    className="text-sm file:mr-3 file:rounded-xl file:border-0 file:bg-blush-100 file:px-3 file:py-2 file:text-blush-600"
+                  />
+                  <button type="submit" className="btn" disabled={busy}>
+                    {order.photo?.filename ? "Replace photo" : "Upload photo"}
+                  </button>
+                </div>
+                <p className="mt-2 text-xs text-slate-400">JPG, PNG or WEBP, up to 2 MB</p>
+              </form>
             )}
           </div>
 

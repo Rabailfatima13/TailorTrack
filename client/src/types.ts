@@ -61,6 +61,7 @@ export interface Order {
     originalName: string;
   };
   createdAt: string;
+  updatedAt: string;
 }
 
 export interface DashboardData {
