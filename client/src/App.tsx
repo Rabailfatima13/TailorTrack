@@ -9,6 +9,7 @@ import Dashboard from "./pages/Dashboard";
 import Customers from "./pages/Customers";
 import Orders from "./pages/Orders";
 import NewOrder from "./pages/NewOrder";
+import OrderDetails from "./pages/OrderDetails";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -30,6 +31,7 @@ function App() {
       >
         <Route index element={<Dashboard />} />
         <Route path="orders" element={<Orders />} />
+        <Route path="orders/:id" element={<OrderDetails />} />
         <Route
           path="orders/new"
           element={

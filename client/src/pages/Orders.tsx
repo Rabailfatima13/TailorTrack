@@ -140,7 +140,11 @@ function Orders() {
                     <p className="font-medium">{order.customer.name}</p>
                     <p className="text-xs text-slate-400">{order.customer.phone}</p>
                   </td>
-                  <td className="px-4 py-3">{order.garmentType}</td>
+                  <td className="px-4 py-3">
+                    <Link to={`/orders/${order._id}`} className="text-powder-600 hover:underline">
+                      {order.garmentType}
+                    </Link>
+                  </td>
                   {isOwner && <td className="px-4 py-3">{order.assignedTo.name}</td>}
                   <td className="px-4 py-3">
                     <span className={order.isOverdue ? "font-medium text-red-500" : ""}>
