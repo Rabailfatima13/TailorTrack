@@ -16,6 +16,11 @@ function Staff() {
   const [phone, setPhone] = useState("");
   const [saving, setSaving] = useState(false);
 
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editPhone, setEditPhone] = useState("");
+  const [editPassword, setEditPassword] = useState("");
+
   async function loadStaff() {
     setLoading(true);
     setError("");
@@ -65,6 +70,36 @@ function Staff() {
     try {
       await api.put(`/users/staff/${person._id}`, { active: !person.active });
       setSuccess(`${person.name} was ${person.active ? "deactivated" : "activated"}`);
+      loadStaff();
+    } catch (err) {
+      setError(getErrorMessage(err));
+    }
+  }
+
+  function startEdit(person: User) {
+    setEditingId(person._id);
+    setEditName(person.name);
+    setEditPhone(person.phone || "");
+    setEditPassword("");
+    setError("");
+    setSuccess("");
+  }
+
+  async function saveEdit(person: User) {
+    if (!editName.trim()) {
+      setError("Name is required");
+      return;
+    }
+    if (editPassword && editPassword.length < 6) {
+      setError("New password must be at least 6 characters");
+      return;
+    }
+    try {
+      const body: Record<string, string> = { name: editName.trim(), phone: editPhone.trim() };
+      if (editPassword) body.password = editPassword;
+      await api.put(`/users/staff/${person._id}`, body);
+      setEditingId(null);
+      setSuccess(editPassword ? `${editName} updated and password reset` : `${editName} updated`);
       loadStaff();
     } catch (err) {
       setError(getErrorMessage(err));
@@ -128,6 +163,38 @@ function Staff() {
             <tbody>
               {staff.map((person) => {
                 const stats = statsFor(person._id);
+                if (editingId === person._id) {
+                  return (
+                    <tr key={person._id} className="border-t border-blush-50 bg-powder-50/40">
+                      <td className="px-4 py-3">
+                        <input className="input" value={editName} onChange={(e) => setEditName(e.target.value)} />
+                      </td>
+                      <td className="px-4 py-3">{person.username}</td>
+                      <td className="px-4 py-3">
+                        <input className="input" value={editPhone} onChange={(e) => setEditPhone(e.target.value)} />
+                      </td>
+                      <td className="px-4 py-3" colSpan={3}>
+                        <input
+                          className="input"
+                          type="password"
+                          placeholder="New password (leave blank to keep)"
+                          value={editPassword}
+                          onChange={(e) => setEditPassword(e.target.value)}
+                        />
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <span className="flex justify-end gap-3">
+                          <button className="text-powder-600 hover:underline" onClick={() => saveEdit(person)}>
+                            Save
+                          </button>
+                          <button className="text-slate-500 hover:underline" onClick={() => setEditingId(null)}>
+                            Cancel
+                          </button>
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                }
                 return (
                   <tr key={person._id} className="border-t border-blush-50 hover:bg-blush-50/50">
                     <td className="px-4 py-3 font-medium">{person.name}</td>
@@ -137,9 +204,14 @@ function Staff() {
                     <td className="px-4 py-3">{(stats?.earned ?? 0).toLocaleString()}</td>
                     <td className="px-4 py-3">{person.active ? "Active" : "Inactive"}</td>
                     <td className="px-4 py-3 text-right">
-                      <button className="text-powder-600 hover:underline" onClick={() => toggleActive(person)}>
-                        {person.active ? "Deactivate" : "Activate"}
-                      </button>
+                      <span className="flex justify-end gap-3">
+                        <button className="text-powder-600 hover:underline" onClick={() => startEdit(person)}>
+                          Edit
+                        </button>
+                        <button className="text-blush-600 hover:underline" onClick={() => toggleActive(person)}>
+                          {person.active ? "Deactivate" : "Activate"}
+                        </button>
+                      </span>
                     </td>
                   </tr>
                 );
