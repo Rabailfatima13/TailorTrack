@@ -1,18 +1,31 @@
 import { useState, type FormEvent } from "react";
 import api, { getErrorMessage } from "../api/axios";
 import { measurementFields } from "../measurements";
+import type { Customer } from "../types";
 
 interface Props {
+  customer?: Customer;
   onSaved: () => void;
   onCancel: () => void;
 }
 
-function CustomerForm({ onSaved, onCancel }: Props) {
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [address, setAddress] = useState("");
-  const [sizes, setSizes] = useState<Record<string, string>>({});
-  const [notes, setNotes] = useState("");
+function initialSizes(customer?: Customer) {
+  const sizes: Record<string, string> = {};
+  if (!customer) return sizes;
+  for (const field of measurementFields) {
+    const value = customer.measurements?.[field.key];
+    if (value !== undefined && value !== null) sizes[field.key] = String(value);
+  }
+  return sizes;
+}
+
+function CustomerForm({ customer, onSaved, onCancel }: Props) {
+  const isEdit = Boolean(customer);
+  const [name, setName] = useState(customer?.name || "");
+  const [phone, setPhone] = useState(customer?.phone || "");
+  const [address, setAddress] = useState(customer?.address || "");
+  const [sizes, setSizes] = useState<Record<string, string>>(() => initialSizes(customer));
+  const [notes, setNotes] = useState(customer?.measurements?.notes || "");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
@@ -44,7 +57,12 @@ function CustomerForm({ onSaved, onCancel }: Props) {
     setSaving(true);
     setError("");
     try {
-      await api.post("/customers", { name, phone, address, measurements });
+      const body = { name, phone, address, measurements };
+      if (customer) {
+        await api.put(`/customers/${customer._id}`, body);
+      } else {
+        await api.post("/customers", body);
+      }
       onSaved();
     } catch (err) {
       setError(getErrorMessage(err));
@@ -55,7 +73,7 @@ function CustomerForm({ onSaved, onCancel }: Props) {
 
   return (
     <form onSubmit={handleSubmit} className="card mb-6 p-5">
-      <h2 className="mb-4 text-lg font-semibold">New customer</h2>
+      <h2 className="mb-4 text-lg font-semibold">{isEdit ? `Edit ${customer?.name}` : "New customer"}</h2>
 
       {error && <p className="mb-4 rounded-xl bg-red-50 p-2 text-sm text-red-500">{error}</p>}
 
@@ -101,7 +119,7 @@ function CustomerForm({ onSaved, onCancel }: Props) {
 
       <div className="mt-5 flex gap-3">
         <button type="submit" className="btn" disabled={saving}>
-          {saving ? "Saving..." : "Save customer"}
+          {saving ? "Saving..." : isEdit ? "Save changes" : "Save customer"}
         </button>
         <button
           type="button"
