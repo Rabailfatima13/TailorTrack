@@ -31,9 +31,14 @@ function Layout() {
                 {user?.role === "owner" ? "Orders" : "My Orders"}
               </NavLink>
               {user?.role === "owner" && (
-                <NavLink to="/customers" className={linkClass}>
-                  Customers
-                </NavLink>
+                <>
+                  <NavLink to="/customers" className={linkClass}>
+                    Customers
+                  </NavLink>
+                  <NavLink to="/staff" className={linkClass}>
+                    Staff
+                  </NavLink>
+                </>
               )}
             </nav>
           </div>
