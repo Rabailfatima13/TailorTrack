@@ -8,6 +8,7 @@ function Customers() {
   const [search, setSearch] = useState("");
   const [showArchived, setShowArchived] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [editing, setEditing] = useState<Customer | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -54,8 +55,9 @@ function Customers() {
   }
 
   function handleSaved() {
+    setSuccess(editing ? "Customer updated" : "Customer added");
     setShowForm(false);
-    setSuccess("Customer added");
+    setEditing(null);
     loadCustomers();
   }
 
@@ -63,7 +65,7 @@ function Customers() {
     <div>
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold">Customers</h1>
-        {!showForm && (
+        {!showForm && !editing && (
           <button className="btn" onClick={() => setShowForm(true)}>
             + Add customer
           </button>
@@ -71,6 +73,14 @@ function Customers() {
       </div>
 
       {showForm && <CustomerForm onSaved={handleSaved} onCancel={() => setShowForm(false)} />}
+      {editing && (
+        <CustomerForm
+          key={editing._id}
+          customer={editing}
+          onSaved={handleSaved}
+          onCancel={() => setEditing(null)}
+        />
+      )}
 
       {success && <p className="mb-4 rounded-xl bg-green-50 p-2 text-sm text-green-600">{success}</p>}
       {error && <p className="mb-4 rounded-xl bg-red-50 p-2 text-sm text-red-500">{error}</p>}
@@ -122,9 +132,21 @@ function Customers() {
                         Restore
                       </button>
                     ) : (
-                      <button onClick={() => handleArchive(customer)} className="text-blush-600 hover:underline">
-                        Remove
-                      </button>
+                      <span className="flex justify-end gap-3">
+                        <button
+                          onClick={() => {
+                            setShowForm(false);
+                            setEditing(customer);
+                            window.scrollTo({ top: 0, behavior: "smooth" });
+                          }}
+                          className="text-powder-600 hover:underline"
+                        >
+                          Edit
+                        </button>
+                        <button onClick={() => handleArchive(customer)} className="text-blush-600 hover:underline">
+                          Remove
+                        </button>
+                      </span>
                     )}
                   </td>
                 </tr>
