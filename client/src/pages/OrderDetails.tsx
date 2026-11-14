@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import api, { getErrorMessage } from "../api/axios";
 import StatusBadge from "../components/StatusBadge";
 import { measurementFields } from "../measurements";
@@ -19,6 +19,7 @@ function formatDate(date: string) {
 
 function OrderDetails() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const user = useAppSelector((state) => state.auth.user);
   const isOwner = user?.role === "owner";
 
@@ -45,6 +46,19 @@ function OrderDetails() {
   useEffect(() => {
     loadOrder();
   }, [id]);
+
+  async function handleDelete() {
+    if (!window.confirm("Delete this order? This cannot be undone.")) return;
+    setBusy(true);
+    setError("");
+    try {
+      await api.delete(`/orders/${id}`);
+      navigate("/orders");
+    } catch (err) {
+      setError(getErrorMessage(err));
+      setBusy(false);
+    }
+  }
 
   async function changeStatus(status: OrderStatus) {
     setBusy(true);
@@ -157,6 +171,15 @@ function OrderDetails() {
           >
             Print summary
           </button>
+          {isOwner && (
+            <button
+              onClick={handleDelete}
+              disabled={busy}
+              className="rounded-xl border border-red-200 px-4 py-2 text-sm text-red-500 hover:bg-red-50"
+            >
+              Delete order
+            </button>
+          )}
           <Link to="/orders" className="text-sm text-powder-600 hover:underline">
             Back to orders
           </Link>
