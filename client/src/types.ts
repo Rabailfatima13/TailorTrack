@@ -70,3 +70,11 @@ export interface DashboardData {
   overdueOrders: number;
   upcoming: Order[];
 }
+
+export interface StaffSummary {
+  staffId: string;
+  name: string;
+  active: boolean;
+  completedOrders: number;
+  earned: number;
+}
