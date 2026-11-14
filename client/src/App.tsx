@@ -10,6 +10,7 @@ import Customers from "./pages/Customers";
 import Orders from "./pages/Orders";
 import NewOrder from "./pages/NewOrder";
 import OrderDetails from "./pages/OrderDetails";
+import Staff from "./pages/Staff";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -45,6 +46,14 @@ function App() {
           element={
             <ProtectedRoute role="owner">
               <Customers />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="staff"
+          element={
+            <ProtectedRoute role="owner">
+              <Staff />
             </ProtectedRoute>
           }
         />
