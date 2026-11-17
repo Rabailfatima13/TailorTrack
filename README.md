@@ -49,6 +49,18 @@ npm run dev
 
 The API runs on `http://localhost:5000/api`.
 
+### Environment variables
+
+Set these in `server/.env` (copy `server/.env.example`); the server stops at startup and names any required variable that is missing.
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `MONGO_URI` | yes | MongoDB connection string |
+| `JWT_SECRET` | yes | Long random string used to sign login tokens; never commit it |
+| `CLIENT_URL` | yes | Frontend address allowed by CORS (default `http://localhost:5173`) |
+| `PORT` | no | Port for the API; defaults to `5000` |
+| `NODE_ENV` | no | Set to `production` when deploying; enables the secure cookie flag |
+
 ### Frontend
 
 Open a second terminal while the backend is running:
@@ -73,6 +85,7 @@ Open `http://localhost:5173` in the browser. Requests to `/api` are forwarded to
 
 | Method | Route | Who |
 |--------|-------|-----|
+| GET | /api/health | everyone |
 | POST | /api/auth/login, /api/auth/logout | everyone |
 | GET | /api/auth/me | logged in |
 | GET, POST | /api/customers | owner |
@@ -89,6 +102,12 @@ Open `http://localhost:5173` in the browser. Requests to `/api` are forwarded to
 | GET, POST | /api/users/staff | owner |
 | PUT | /api/users/staff/:id | owner |
 | GET | /api/users/staff/summary | owner |
+
+## Security notes
+
+- Passwords are hashed with bcrypt and never returned by the API.
+- Login attempts are limited: after 10 wrong passwords for the same username from the same IP address, login is blocked for 15 minutes (HTTP 429).
+- The login cookie is `httpOnly` (not readable by JavaScript) and, when `NODE_ENV=production`, `secure` (sent over HTTPS only).
 
 ## Team
 
