@@ -49,6 +49,18 @@ npm run dev
 
 The API runs on `http://localhost:5000/api`.
 
+### Environment variables
+
+Set these in `server/.env` (copy `server/.env.example`); the server stops at startup and names any required variable that is missing.
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `MONGO_URI` | yes | MongoDB connection string |
+| `JWT_SECRET` | yes | Long random string used to sign login tokens; never commit it |
+| `CLIENT_URL` | yes | Frontend address allowed by CORS (default `http://localhost:5173`) |
+| `PORT` | no | Port for the API; defaults to `5000` |
+| `NODE_ENV` | no | Set to `production` when deploying; enables the secure cookie flag |
+
 ### Frontend
 
 Open a second terminal while the backend is running:
