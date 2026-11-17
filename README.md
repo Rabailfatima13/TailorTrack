@@ -91,6 +91,11 @@ Open `http://localhost:5173` in the browser. Requests to `/api` are forwarded to
 | PUT | /api/users/staff/:id | owner |
 | GET | /api/users/staff/summary | owner |
 
+## Security notes
+
+- Passwords are hashed with bcrypt and never returned by the API.
+- Login attempts are limited: after 10 wrong passwords for the same username from the same IP address, login is blocked for 15 minutes (HTTP 429).
+
 ## Team
 
 | Member | Contribution |
