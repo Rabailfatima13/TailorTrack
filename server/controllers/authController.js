@@ -27,6 +27,7 @@ const login = catchAsync(async (req, res) => {
   res.cookie("token", token, {
     httpOnly: true,
     sameSite: "lax",
+    secure: process.env.NODE_ENV === "production", // only sent over HTTPS when deployed
     maxAge: ONE_DAY,
   });
 
