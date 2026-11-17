@@ -73,6 +73,7 @@ Open `http://localhost:5173` in the browser. Requests to `/api` are forwarded to
 
 | Method | Route | Who |
 |--------|-------|-----|
+| GET | /api/health | everyone |
 | POST | /api/auth/login, /api/auth/logout | everyone |
 | GET | /api/auth/me | logged in |
 | GET, POST | /api/customers | owner |
