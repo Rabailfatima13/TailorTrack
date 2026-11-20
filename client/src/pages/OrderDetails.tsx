@@ -171,7 +171,7 @@ function OrderDetails() {
           >
             Print summary
           </button>
-          {isOwner && (
+          {isOwner && order.status !== "Delivered" && (
             <Link
               to={`/orders/${order._id}/edit`}
               className="rounded-xl border border-blush-200 px-4 py-2 text-sm text-blush-600 hover:bg-blush-50"

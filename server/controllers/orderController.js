@@ -126,6 +126,15 @@ const updateOrder = catchAsync(async (req, res) => {
   if (!order) {
     return res.status(404).json({ message: "Order not found" });
   }
+  if (order.status === "Delivered") {
+    return res.status(400).json({ message: "Delivered orders cannot be edited" });
+  }
+
+  const { dueDate } = req.body;
+  const dueDateChanged = dueDate && new Date(dueDate).getTime() !== order.dueDate.getTime();
+  if (dueDateChanged && new Date(dueDate) < startOfToday()) {
+    return res.status(400).json({ message: "Due date cannot be in the past" });
+  }
 
   const fields = ["garmentType", "measurements", "instructions", "price", "advance", "dueDate", "workRate"];
   fields.forEach((field) => {

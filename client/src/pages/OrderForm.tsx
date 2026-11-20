@@ -32,6 +32,7 @@ function OrderForm() {
   const [workRate, setWorkRate] = useState("");
   const [instructions, setInstructions] = useState("");
   const [sizes, setSizes] = useState<Record<string, string>>({});
+  const [delivered, setDelivered] = useState(false);
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -48,6 +49,7 @@ function OrderForm() {
       .then((res) => {
         const order: Order = res.data;
         const due = toDateInput(new Date(order.dueDate));
+        setDelivered(order.status === "Delivered");
         setCustomerId(order.customer._id);
         setCustomerName(`${order.customer.name} (${order.customer.phone})`);
         setAssignedTo(order.assignedTo._id);
@@ -148,6 +150,19 @@ function OrderForm() {
   }
 
   if (loading) return <p className="text-slate-500">Loading...</p>;
+
+  if (delivered) {
+    return (
+      <div>
+        <p className="mb-4 rounded-xl bg-red-50 p-3 text-red-500">
+          This order has been delivered, so it can no longer be edited.
+        </p>
+        <Link to={`/orders/${id}`} className="text-powder-600 hover:underline">
+          Back to order
+        </Link>
+      </div>
+    );
+  }
 
   const staffOptions = staffList.filter((s) => s.active || s._id === assignedTo);
 
