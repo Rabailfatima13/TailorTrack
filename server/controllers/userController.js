@@ -20,6 +20,20 @@ const updateStaff = catchAsync(async (req, res) => {
   }
 
   const { name, phone, active, password } = req.body;
+
+  // A deactivated account cannot log in, so unfinished work assigned to it would be stuck
+  if (active === false && user.active) {
+    const openOrders = await Order.countDocuments({
+      assignedTo: user._id,
+      status: { $in: ["Pending", "In progress"] },
+    });
+    if (openOrders > 0) {
+      return res.status(400).json({
+        message: `${user.name} still has ${openOrders} unfinished order(s). Reassign them before deactivating.`,
+      });
+    }
+  }
+
   if (name !== undefined) user.name = name;
   if (phone !== undefined) user.phone = phone;
   if (active !== undefined) user.active = active;

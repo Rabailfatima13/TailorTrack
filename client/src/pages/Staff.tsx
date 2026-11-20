@@ -75,6 +75,8 @@ function Staff() {
   }
 
   async function toggleActive(person: User) {
+    setError("");
+    setSuccess("");
     try {
       await api.put(`/users/staff/${person._id}`, { active: !person.active });
       setSuccess(`${person.name} was ${person.active ? "deactivated" : "activated"}`);
