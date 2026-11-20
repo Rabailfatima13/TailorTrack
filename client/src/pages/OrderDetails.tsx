@@ -209,6 +209,7 @@ function OrderDetails() {
             <div>
               <p className="text-xs text-slate-400">Assigned to</p>
               <p className="font-medium">{order.assignedTo.name}</p>
+              <p className="no-print text-sm text-slate-500">Work rate: Rs {order.workRate}</p>
             </div>
             <div>
               <p className="text-xs text-slate-400">Due date</p>
@@ -219,6 +220,12 @@ function OrderDetails() {
             <div>
               <p className="text-xs text-slate-400">Status</p>
               <StatusBadge status={order.status} />
+              {order.status === "Ready" && order.readyAt && (
+                <p className="mt-1 text-sm text-slate-500">Ready since {formatDate(order.readyAt)}</p>
+              )}
+              {order.status === "Delivered" && order.deliveredAt && (
+                <p className="mt-1 text-sm text-slate-500">Delivered on {formatDate(order.deliveredAt)}</p>
+              )}
             </div>
             <div className="sm:col-span-2">
               <p className="text-xs text-slate-400">Instructions</p>

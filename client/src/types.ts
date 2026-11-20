@@ -56,6 +56,8 @@ export interface Order {
   dueDate: string;
   status: OrderStatus;
   workRate: number;
+  readyAt?: string;
+  deliveredAt?: string;
   photo?: {
     filename: string;
     originalName: string;
