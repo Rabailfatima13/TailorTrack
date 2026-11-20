@@ -6,14 +6,30 @@ TailorTrack replaces a tailoring shop's paper notebooks with one web app. It kee
 measurements, orders, payments and delivery dates in one place. The shop owner manages customers and
 orders, and staff update the orders assigned to them.
 
-## Features (planned)
+## Features
 
-- **Accounts and permissions**: Owner and Staff login/logout. Staff can view and update only their assigned orders.
-- **Customers and measurements**: create, view, edit and search customers (by name or phone). Customers with order history are archived instead of deleted.
-- **Orders and assignment**: each order is linked to a customer and stores its own copy of the measurements, plus garment type, instructions, price, advance payment, due date and the assigned staff member.
-- **Order progress**: Pending → In progress → Ready → Delivered, with overdue highlighting and filters by status, staff member or due date.
-- **Payments and dashboard**: manual payment entries, a calculated remaining balance, counts of active, ready and overdue orders, and a printable order summary.
-- **Garment photos and staff work summary**: validated photo upload, a per-order work rate, and each staff member's completed orders and earned total.
+- **Accounts and permissions**: Owner and Staff login/logout. Only the owner can add staff accounts (nobody can sign up as Owner). Staff can view and update only their assigned orders. Every rule is checked by the API, not only by hiding buttons.
+- **Customers and measurements**: add, view, edit and search customers by name or phone. Each customer page shows their saved measurements and order history, and has a button to start a new order. Customers with order history are archived instead of deleted and can be restored.
+- **Orders and assignment**: each order is linked to a customer and an active staff member. It keeps its own copy of the measurements, so editing the customer later does not change old orders. It also stores garment type, instructions, price, advance payment, due date and the staff work rate.
+- **Order progress**: Pending → In progress → Ready → Delivered. Overdue unfinished orders are highlighted. Orders can be filtered by status (including "active", meaning not delivered), staff member, due date range, overdue, or customer name/phone. Filters are kept in the page URL.
+- **Payments and dashboard**: payments are recorded by hand and the remaining balance is calculated. The dashboard shows active, ready and overdue counts (each links to the matching orders) and deliveries due in the next 7 days. Order details have a printable summary using the browser's print.
+- **Garment photos and staff work summary**: JPG/PNG/WEBP photos up to 2 MB, viewable only by the owner and the assigned staff member. The staff page shows each person's completed orders (Ready or Delivered) and the total of their work rates.
+- **Responsive layout**: works on phones (collapsible menu) and desktops.
+
+## Business rules
+
+| Rule | Where it is checked |
+|------|---------------------|
+| Price must be greater than 0; advance and payments cannot be negative | form + API |
+| Total paid (advance + payments) can never be more than the price | form + API |
+| Due date cannot be set in the past | form + API |
+| Status can only move one step: Pending ↔ In progress ↔ Ready → Delivered | API (buttons only show allowed steps) |
+| Staff can move their own orders up to Ready; only the owner marks Delivered | API |
+| Delivered orders cannot be edited | API (Edit button hidden) |
+| Orders can only be assigned to active staff members | API |
+| Staff with Pending or In progress orders cannot be deactivated until those are reassigned | API |
+| Customers with orders are archived, not deleted; archived customers cannot get new orders | API |
+| Photos must be JPG, PNG or WEBP and at most 2 MB | form + API |
 
 ## Tech stack
 
@@ -90,7 +106,7 @@ Open `http://localhost:5173` in the browser. Requests to `/api` are forwarded to
 | GET | /api/auth/me | logged in |
 | GET, POST | /api/customers | owner |
 | GET, PUT, DELETE | /api/customers/:id | owner |
-| GET | /api/orders?status=&staff=&from=&to=&overdue=&search= | owner (all), staff (assigned only) |
+| GET | /api/orders?status=&staff=&from=&to=&overdue=&search= (`status=active` = not delivered) | owner (all), staff (assigned only) |
 | POST | /api/orders | owner |
 | GET | /api/orders/:id | owner, assigned staff |
 | PUT, DELETE | /api/orders/:id | owner |
