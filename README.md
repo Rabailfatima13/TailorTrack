@@ -130,4 +130,4 @@ Open `http://localhost:5173` in the browser. Requests to `/api` are forwarded to
 | Member | Contribution |
 |--------|--------------|
 | Rabail Fatima | Project setup; Express server, MongoDB models, auth, customer and order APIs, photo upload and seed data; React setup with Vite, Tailwind and Redux; login, dashboard, customers, customer details, order form, order details and theme |
-| Mahnoor | Staff page and work summary; editing customers, staff and orders; server hardening (env checks, health check, login limits, secure cookie); order search, filters and active filter; dashboard links; mobile menu; business-rule checks; session expiry; print summary; sample data; README |
+| Mahnoor Rauf | Staff page and work summary; editing customers, staff and orders; server hardening (env checks, health check, login limits, secure cookie); order search, filters and active filter; dashboard links; mobile menu; business-rule checks; session expiry; print summary; sample data; README |
