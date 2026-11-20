@@ -2,6 +2,7 @@ const Order = require("../models/Order");
 const Customer = require("../models/Customer");
 const User = require("../models/User");
 const catchAsync = require("../utils/catchAsync");
+const escapeRegex = require("../utils/escapeRegex");
 const { removeFile } = require("./photoController");
 
 const nextStatus = {
@@ -31,7 +32,7 @@ function startOfToday() {
 }
 
 const getOrders = catchAsync(async (req, res) => {
-  const { status, staff, from, to, overdue, customer } = req.query;
+  const { status, staff, from, to, overdue, customer, search } = req.query;
   const filter = {};
 
   if (req.user.role === "staff") {
@@ -41,7 +42,13 @@ const getOrders = catchAsync(async (req, res) => {
   }
 
   if (status) filter.status = status;
-  if (customer) filter.customer = customer;
+  if (customer) {
+    filter.customer = customer;
+  } else if (search && search.trim()) {
+    const pattern = new RegExp(escapeRegex(search.trim()), "i");
+    const matches = await Customer.find({ $or: [{ name: pattern }, { phone: pattern }] }).select("_id");
+    filter.customer = { $in: matches.map((c) => c._id) };
+  }
 
   if (from || to) {
     filter.dueDate = {};

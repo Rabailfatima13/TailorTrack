@@ -1,10 +1,7 @@
 const Customer = require("../models/Customer");
 const Order = require("../models/Order");
 const catchAsync = require("../utils/catchAsync");
-
-function escapeRegex(text) {
-  return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
+const escapeRegex = require("../utils/escapeRegex");
 
 const getCustomers = catchAsync(async (req, res) => {
   const { search, archived } = req.query;

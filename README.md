@@ -90,7 +90,7 @@ Open `http://localhost:5173` in the browser. Requests to `/api` are forwarded to
 | GET | /api/auth/me | logged in |
 | GET, POST | /api/customers | owner |
 | GET, PUT, DELETE | /api/customers/:id | owner |
-| GET | /api/orders | owner (all), staff (assigned only) |
+| GET | /api/orders?status=&staff=&from=&to=&overdue=&search= | owner (all), staff (assigned only) |
 | POST | /api/orders | owner |
 | GET | /api/orders/:id | owner, assigned staff |
 | PUT, DELETE | /api/orders/:id | owner |

@@ -20,6 +20,8 @@ function Orders() {
   const from = searchParams.get("from") || "";
   const to = searchParams.get("to") || "";
   const overdue = searchParams.get("overdue") === "true";
+  const search = searchParams.get("search") || "";
+  const [searchText, setSearchText] = useState(search);
 
   const [orders, setOrders] = useState<Order[]>([]);
   const [staffList, setStaffList] = useState<User[]>([]);
@@ -40,20 +42,33 @@ function Orders() {
     setLoading(true);
     setError("");
     api
-      .get("/orders", { params: { status, staff, from, to, overdue: overdue || undefined } })
+      .get("/orders", { params: { status, staff, from, to, search, overdue: overdue || undefined } })
       .then((res) => setOrders(res.data))
       .catch((err) => setError(getErrorMessage(err)))
       .finally(() => setLoading(false));
-  }, [status, staff, from, to, overdue]);
+  }, [status, staff, from, to, search, overdue]);
+
+  // Wait until the user stops typing before searching
+  useEffect(() => {
+    if (searchText.trim() === search) return;
+    const timer = setTimeout(() => setFilter("search", searchText.trim()), 300);
+    return () => clearTimeout(timer);
+  }, [searchText]);
 
   function setFilter(name: string, value: string) {
-    const params = new URLSearchParams(searchParams);
-    if (value) params.set(name, value);
-    else params.delete(name);
-    setSearchParams(params, { replace: true });
+    setSearchParams(
+      (prev) => {
+        const params = new URLSearchParams(prev);
+        if (value) params.set(name, value);
+        else params.delete(name);
+        return params;
+      },
+      { replace: true }
+    );
   }
 
   function clearFilters() {
+    setSearchText("");
     setSearchParams({}, { replace: true });
   }
 
@@ -71,6 +86,16 @@ function Orders() {
       {message && <p className="mb-4 rounded-xl bg-green-50 p-2 text-sm text-green-600">{message}</p>}
 
       <div className="card mb-5 flex flex-wrap items-end gap-4 p-4">
+        <div>
+          <label className="mb-1 block text-xs text-slate-500">Customer</label>
+          <input
+            className="input"
+            placeholder="Name or phone"
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+          />
+        </div>
+
         <div>
           <label className="mb-1 block text-xs text-slate-500">Status</label>
           <select className="input" value={status} onChange={(e) => setFilter("status", e.target.value)} disabled={overdue}>
