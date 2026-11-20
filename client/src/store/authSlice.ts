@@ -40,7 +40,12 @@ export const logout = createAsyncThunk("auth/logout", async () => {
 const authSlice = createSlice({
   name: "auth",
   initialState,
-  reducers: {},
+  reducers: {
+    sessionExpired: (state) => {
+      state.user = null;
+      state.error = "Your session has expired, please log in again";
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchMe.fulfilled, (state, action) => {
@@ -69,4 +74,5 @@ const authSlice = createSlice({
   },
 });
 
+export const { sessionExpired } = authSlice.actions;
 export default authSlice.reducer;
