@@ -22,4 +22,14 @@ body {
   .no-print {
     display: none;
   }
+
+  /* Plain white page without shadows so the summary prints cleanly */
+  body {
+    background: white;
+  }
+
+  .card {
+    box-shadow: none;
+    break-inside: avoid;
+  }
 }

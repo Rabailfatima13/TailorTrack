@@ -159,10 +159,19 @@ function OrderDetails() {
 
   return (
     <div>
+      <div className="mb-4 hidden border-b border-slate-300 pb-3 print:block">
+        <p className="text-xl font-bold">TailorTrack</p>
+        <p className="text-sm">
+          Order summary · Order #{order._id.slice(-6).toUpperCase()} · Printed {formatDate(new Date().toISOString())}
+        </p>
+      </div>
+
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold">{order.garmentType}</h1>
-          <p className="text-sm text-slate-500">Order placed on {formatDate(order.createdAt)}</p>
+          <p className="text-sm text-slate-500">
+            Order #{order._id.slice(-6).toUpperCase()} · placed on {formatDate(order.createdAt)}
+          </p>
         </div>
         <div className="no-print flex items-center gap-4">
           <button
