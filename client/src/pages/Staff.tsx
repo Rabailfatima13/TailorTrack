@@ -1,4 +1,5 @@
 import { useEffect, useState, type FormEvent } from "react";
+import { Link } from "react-router-dom";
 import api, { getErrorMessage } from "../api/axios";
 import type { StaffSummary, User } from "../types";
 
@@ -207,11 +208,15 @@ function Staff() {
                 }
                 return (
                   <tr key={person._id} className="border-t border-blush-50 hover:bg-blush-50/50">
-                    <td className="px-4 py-3 font-medium">{person.name}</td>
+                    <td className="px-4 py-3 font-medium">
+                      <Link to={`/orders?staff=${person._id}`} className="text-powder-600 hover:underline">
+                        {person.name}
+                      </Link>
+                    </td>
                     <td className="px-4 py-3">{person.username}</td>
                     <td className="px-4 py-3">{person.phone || "-"}</td>
                     <td className="px-4 py-3">{stats?.completedOrders ?? 0}</td>
-                    <td className="px-4 py-3">{(stats?.earned ?? 0).toLocaleString()}</td>
+                    <td className="px-4 py-3">Rs {(stats?.earned ?? 0).toLocaleString()}</td>
                     <td className="px-4 py-3">{person.active ? "Active" : "Inactive"}</td>
                     <td className="px-4 py-3 text-right">
                       <span className="flex justify-end gap-3">
@@ -229,6 +234,13 @@ function Staff() {
             </tbody>
           </table>
         </div>
+      )}
+
+      {!loading && staff.length > 0 && (
+        <p className="mt-3 text-xs text-slate-400">
+          Completed orders are orders marked Ready or Delivered. Earned is the total of their work rates. Click a
+          name to see that person's orders.
+        </p>
       )}
     </div>
   );
