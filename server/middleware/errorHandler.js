@@ -23,7 +23,7 @@ function errorHandler(err, req, res, next) {
 
   if (err.code === 11000) {
     status = 400;
-    message = "This value already exists";
+    message = err.keyValue && err.keyValue.username ? "This username is already taken" : "This value already exists";
   }
 
   if (status === 500) console.log(err);

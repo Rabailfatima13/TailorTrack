@@ -10,8 +10,14 @@ const userSchema = new mongoose.Schema(
       unique: true,
       lowercase: true,
       trim: true,
+      match: [/^[a-z0-9._]{3,20}$/, "Username must be 3-20 letters, numbers, dots or underscores"],
     },
-    password: { type: String, required: [true, "Password is required"], minlength: 6 },
+    // Custom message so the default one (which repeats the typed password) is never sent back
+    password: {
+      type: String,
+      required: [true, "Password is required"],
+      minlength: [6, "Password must be at least 6 characters"],
+    },
     role: { type: String, enum: ["owner", "staff"], default: "staff" },
     phone: { type: String, trim: true },
     active: { type: Boolean, default: true },

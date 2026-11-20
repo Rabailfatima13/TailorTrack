@@ -48,6 +48,14 @@ function Staff() {
       setError("Name, username and password are required");
       return;
     }
+    if (!/^[a-zA-Z0-9._]{3,20}$/.test(username.trim())) {
+      setError("Username must be 3-20 letters, numbers, dots or underscores");
+      return;
+    }
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters");
+      return;
+    }
     setSaving(true);
     setError("");
     try {
