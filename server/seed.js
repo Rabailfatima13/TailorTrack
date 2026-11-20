@@ -39,9 +39,16 @@ async function seed() {
       phone: "0333-1112233",
       measurements: { chest: 42, waist: 36, shoulder: 19, sleeve: 25, neck: 16, length: 43 },
     },
+    {
+      name: "Usman Tariq",
+      phone: "0345-9988776",
+      address: "Johar Town, Lahore",
+      measurements: { chest: 38, waist: 32, shoulder: 17, sleeve: 23, neck: 15, length: 41 },
+      archived: true,
+    },
   ]);
 
-  const [hamza, ayesha, bilal] = customers;
+  const [hamza, ayesha, bilal, usman] = customers;
 
   await Order.create([
     {
@@ -91,9 +98,37 @@ async function seed() {
       readyAt: new Date(),
       workRate: 500,
     },
+    {
+      customer: bilal._id,
+      assignedTo: ali._id,
+      garmentType: "Suit",
+      measurements: bilal.measurements,
+      instructions: "Two buttons, slim fit",
+      price: 9000,
+      advance: 4000,
+      payments: [{ amount: 5000, date: daysFromNow(-3), note: "Paid at pickup" }],
+      dueDate: daysFromNow(-4),
+      status: "Delivered",
+      readyAt: daysFromNow(-5),
+      deliveredAt: daysFromNow(-3),
+      workRate: 2000,
+    },
+    {
+      customer: usman._id,
+      assignedTo: sara._id,
+      garmentType: "Sherwani",
+      measurements: usman.measurements,
+      price: 18000,
+      advance: 18000,
+      dueDate: daysFromNow(-30),
+      status: "Delivered",
+      readyAt: daysFromNow(-32),
+      deliveredAt: daysFromNow(-30),
+      workRate: 3500,
+    },
   ]);
 
-  console.log("Sample data added");
+  console.log("Sample data added: 1 owner and 2 staff accounts, 4 customers (1 archived), 6 orders");
   console.log("Owner login: owner / owner123");
   console.log("Staff logins: ali / staff123, sara / staff123");
   await mongoose.disconnect();
