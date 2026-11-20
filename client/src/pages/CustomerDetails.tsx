@@ -57,9 +57,16 @@ function CustomerDetails() {
             {customer.address && ` · ${customer.address}`}
           </p>
         </div>
-        <Link to="/customers" className="text-sm text-powder-600 hover:underline">
-          Back to customers
-        </Link>
+        <div className="flex items-center gap-4">
+          {!customer.archived && (
+            <Link to={`/orders/new?customer=${customer._id}`} className="btn">
+              + New order
+            </Link>
+          )}
+          <Link to="/customers" className="text-sm text-powder-600 hover:underline">
+            Back to customers
+          </Link>
+        </div>
       </div>
 
       <div className="mb-5 grid gap-4 sm:grid-cols-3">

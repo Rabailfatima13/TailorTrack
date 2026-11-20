@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import api, { getErrorMessage } from "../api/axios";
 import { measurementFields } from "../measurements";
 import type { Customer, Order, User } from "../types";
@@ -16,6 +16,8 @@ function OrderForm() {
   const { id } = useParams();
   const isEdit = Boolean(id);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const presetCustomer = searchParams.get("customer");
 
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [staffList, setStaffList] = useState<User[]>([]);
@@ -67,6 +69,14 @@ function OrderForm() {
       .catch((err) => setError(getErrorMessage(err)))
       .finally(() => setLoading(false));
   }, [id]);
+
+  // When opened from a customer's page, select that customer and copy their measurements
+  useEffect(() => {
+    if (isEdit || !presetCustomer || customerId) return;
+    if (customers.some((c) => c._id === presetCustomer)) {
+      handleCustomerChange(presetCustomer);
+    }
+  }, [customers, presetCustomer]);
 
   function handleCustomerChange(customerId: string) {
     setCustomerId(customerId);
@@ -145,8 +155,11 @@ function OrderForm() {
     <div>
       <div className="mb-5 flex items-center justify-between">
         <h1 className="text-2xl font-semibold">{isEdit ? "Edit order" : "New order"}</h1>
-        <Link to={isEdit ? `/orders/${id}` : "/orders"} className="text-sm text-powder-600 hover:underline">
-          {isEdit ? "Back to order" : "Back to orders"}
+        <Link
+          to={isEdit ? `/orders/${id}` : presetCustomer ? `/customers/${presetCustomer}` : "/orders"}
+          className="text-sm text-powder-600 hover:underline"
+        >
+          {isEdit ? "Back to order" : presetCustomer ? "Back to customer" : "Back to orders"}
         </Link>
       </div>
 
