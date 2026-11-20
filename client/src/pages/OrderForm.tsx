@@ -1,43 +1,76 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import api, { getErrorMessage } from "../api/axios";
 import { measurementFields } from "../measurements";
-import type { Customer, User } from "../types";
+import type { Customer, Order, User } from "../types";
 
 const garmentTypes = ["Shalwar Kameez", "Kurta", "Waistcoat", "Suit", "Sherwani", "Lehenga", "Shirt", "Trousers"];
 
-function todayString() {
-  const d = new Date();
-  const month = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${d.getFullYear()}-${month}-${day}`;
+function toDateInput(date: Date) {
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${date.getFullYear()}-${month}-${day}`;
 }
 
-function NewOrder() {
+function OrderForm() {
+  const { id } = useParams();
+  const isEdit = Boolean(id);
   const navigate = useNavigate();
 
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [staffList, setStaffList] = useState<User[]>([]);
   const [customerId, setCustomerId] = useState("");
+  const [customerName, setCustomerName] = useState("");
   const [assignedTo, setAssignedTo] = useState("");
   const [garmentType, setGarmentType] = useState("");
   const [price, setPrice] = useState("");
   const [advance, setAdvance] = useState("");
   const [dueDate, setDueDate] = useState("");
+  const [originalDueDate, setOriginalDueDate] = useState("");
   const [workRate, setWorkRate] = useState("");
   const [instructions, setInstructions] = useState("");
   const [sizes, setSizes] = useState<Record<string, string>>({});
+  const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
     api.get("/customers").then((res) => setCustomers(res.data));
-    api.get("/users/staff").then((res) => setStaffList(res.data.filter((s: User) => s.active)));
+    api.get("/users/staff").then((res) => setStaffList(res.data));
   }, []);
 
-  function handleCustomerChange(id: string) {
-    setCustomerId(id);
-    const customer = customers.find((c) => c._id === id);
+  useEffect(() => {
+    if (!id) return;
+    api
+      .get(`/orders/${id}`)
+      .then((res) => {
+        const order: Order = res.data;
+        const due = toDateInput(new Date(order.dueDate));
+        setCustomerId(order.customer._id);
+        setCustomerName(`${order.customer.name} (${order.customer.phone})`);
+        setAssignedTo(order.assignedTo._id);
+        setGarmentType(order.garmentType);
+        setPrice(String(order.price));
+        setAdvance(String(order.advance));
+        setDueDate(due);
+        setOriginalDueDate(due);
+        setWorkRate(String(order.workRate));
+        setInstructions(order.instructions || "");
+
+        const copied: Record<string, string> = {};
+        measurementFields.forEach((field) => {
+          const value = order.measurements?.[field.key];
+          if (value !== undefined) copied[field.key] = String(value);
+        });
+        setSizes(copied);
+      })
+      .catch((err) => setError(getErrorMessage(err)))
+      .finally(() => setLoading(false));
+  }, [id]);
+
+  function handleCustomerChange(customerId: string) {
+    setCustomerId(customerId);
+    const customer = customers.find((c) => c._id === customerId);
     const copied: Record<string, string> = {};
     if (customer) {
       measurementFields.forEach((field) => {
@@ -67,7 +100,7 @@ function NewOrder() {
       setError("Work rate cannot be negative");
       return;
     }
-    if (dueDate < todayString()) {
+    if (dueDate !== originalDueDate && dueDate < toDateInput(new Date())) {
       setError("Due date cannot be in the past");
       return;
     }
@@ -77,33 +110,43 @@ function NewOrder() {
       if (sizes[field.key]) measurements[field.key] = Number(sizes[field.key]);
     }
 
+    const body = {
+      assignedTo,
+      garmentType,
+      price: Number(price),
+      advance: Number(advance) || 0,
+      dueDate,
+      workRate: Number(workRate) || 0,
+      instructions,
+      measurements,
+    };
+
     setSaving(true);
     setError("");
     try {
-      await api.post("/orders", {
-        customerId,
-        assignedTo,
-        garmentType,
-        price: Number(price),
-        advance: Number(advance) || 0,
-        dueDate,
-        workRate: Number(workRate) || 0,
-        instructions,
-        measurements,
-      });
-      navigate("/orders", { state: { message: "Order created" } });
+      if (isEdit) {
+        await api.put(`/orders/${id}`, body);
+        navigate(`/orders/${id}`);
+      } else {
+        await api.post("/orders", { ...body, customerId });
+        navigate("/orders", { state: { message: "Order created" } });
+      }
     } catch (err) {
       setError(getErrorMessage(err));
       setSaving(false);
     }
   }
 
+  if (loading) return <p className="text-slate-500">Loading...</p>;
+
+  const staffOptions = staffList.filter((s) => s.active || s._id === assignedTo);
+
   return (
     <div>
       <div className="mb-5 flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">New order</h1>
-        <Link to="/orders" className="text-sm text-powder-600 hover:underline">
-          Back to orders
+        <h1 className="text-2xl font-semibold">{isEdit ? "Edit order" : "New order"}</h1>
+        <Link to={isEdit ? `/orders/${id}` : "/orders"} className="text-sm text-powder-600 hover:underline">
+          {isEdit ? "Back to order" : "Back to orders"}
         </Link>
       </div>
 
@@ -113,21 +156,25 @@ function NewOrder() {
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <label className="mb-1 block text-sm font-medium">Customer *</label>
-            <select className="input" value={customerId} onChange={(e) => handleCustomerChange(e.target.value)}>
-              <option value="">Select customer</option>
-              {customers.map((c) => (
-                <option key={c._id} value={c._id}>
-                  {c.name} ({c.phone})
-                </option>
-              ))}
-            </select>
+            {isEdit ? (
+              <input className="input bg-slate-50" value={customerName} disabled />
+            ) : (
+              <select className="input" value={customerId} onChange={(e) => handleCustomerChange(e.target.value)}>
+                <option value="">Select customer</option>
+                {customers.map((c) => (
+                  <option key={c._id} value={c._id}>
+                    {c.name} ({c.phone})
+                  </option>
+                ))}
+              </select>
+            )}
           </div>
 
           <div>
             <label className="mb-1 block text-sm font-medium">Assign to *</label>
             <select className="input" value={assignedTo} onChange={(e) => setAssignedTo(e.target.value)}>
               <option value="">Select staff</option>
-              {staffList.map((s) => (
+              {staffOptions.map((s) => (
                 <option key={s._id} value={s._id}>
                   {s.name}
                 </option>
@@ -155,7 +202,7 @@ function NewOrder() {
             <input
               type="date"
               className="input"
-              min={todayString()}
+              min={isEdit ? undefined : toDateInput(new Date())}
               value={dueDate}
               onChange={(e) => setDueDate(e.target.value)}
             />
@@ -196,7 +243,9 @@ function NewOrder() {
 
         <h3 className="mb-1 mt-6 text-sm font-semibold text-powder-600">Measurements (inches)</h3>
         <p className="mb-3 text-xs text-slate-400">
-          Copied from the customer profile. Changes here only apply to this order.
+          {isEdit
+            ? "These belong to this order only. The customer profile is not changed."
+            : "Copied from the customer profile. Changes here only apply to this order."}
         </p>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {measurementFields.map((field) => (
@@ -215,11 +264,11 @@ function NewOrder() {
         </div>
 
         <button type="submit" className="btn mt-6" disabled={saving}>
-          {saving ? "Saving..." : "Create order"}
+          {saving ? "Saving..." : isEdit ? "Save changes" : "Create order"}
         </button>
       </form>
     </div>
   );
 }
 
-export default NewOrder;
+export default OrderForm;

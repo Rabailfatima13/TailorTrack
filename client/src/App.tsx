@@ -8,7 +8,7 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Customers from "./pages/Customers";
 import Orders from "./pages/Orders";
-import NewOrder from "./pages/NewOrder";
+import OrderForm from "./pages/OrderForm";
 import OrderDetails from "./pages/OrderDetails";
 import Staff from "./pages/Staff";
 
@@ -37,7 +37,15 @@ function App() {
           path="orders/new"
           element={
             <ProtectedRoute role="owner">
-              <NewOrder />
+              <OrderForm />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="orders/:id/edit"
+          element={
+            <ProtectedRoute role="owner">
+              <OrderForm />
             </ProtectedRoute>
           }
         />

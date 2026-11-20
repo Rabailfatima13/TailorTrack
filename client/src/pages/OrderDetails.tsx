@@ -172,6 +172,14 @@ function OrderDetails() {
             Print summary
           </button>
           {isOwner && (
+            <Link
+              to={`/orders/${order._id}/edit`}
+              className="rounded-xl border border-blush-200 px-4 py-2 text-sm text-blush-600 hover:bg-blush-50"
+            >
+              Edit order
+            </Link>
+          )}
+          {isOwner && (
             <button
               onClick={handleDelete}
               disabled={busy}
