@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import api, { getErrorMessage } from "../api/axios";
 import CustomerForm from "../components/CustomerForm";
 import type { Customer } from "../types";
@@ -122,7 +123,11 @@ function Customers() {
             <tbody>
               {customers.map((customer) => (
                 <tr key={customer._id} className="border-t border-blush-50 hover:bg-blush-50/50">
-                  <td className="px-4 py-3 font-medium">{customer.name}</td>
+                  <td className="px-4 py-3 font-medium">
+                    <Link to={`/customers/${customer._id}`} className="text-powder-600 hover:underline">
+                      {customer.name}
+                    </Link>
+                  </td>
                   <td className="px-4 py-3">{customer.phone}</td>
                   <td className="px-4 py-3">{customer.address || "-"}</td>
                   <td className="px-4 py-3">{new Date(customer.createdAt).toLocaleDateString()}</td>

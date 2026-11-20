@@ -7,6 +7,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Customers from "./pages/Customers";
+import CustomerDetails from "./pages/CustomerDetails";
 import Orders from "./pages/Orders";
 import OrderForm from "./pages/OrderForm";
 import OrderDetails from "./pages/OrderDetails";
@@ -54,6 +55,14 @@ function App() {
           element={
             <ProtectedRoute role="owner">
               <Customers />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="customers/:id"
+          element={
+            <ProtectedRoute role="owner">
+              <CustomerDetails />
             </ProtectedRoute>
           }
         />
