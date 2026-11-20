@@ -1,4 +1,6 @@
 require("dotenv").config();
+const fs = require("fs");
+const path = require("path");
 const mongoose = require("mongoose");
 const User = require("./models/User");
 const Customer = require("./models/Customer");
@@ -16,6 +18,14 @@ async function seed() {
   await Order.deleteMany();
   await Customer.deleteMany();
   await User.deleteMany();
+
+  // The old orders are gone, so remove their garment photos too
+  const uploadDir = path.join(__dirname, "uploads");
+  if (fs.existsSync(uploadDir)) {
+    fs.readdirSync(uploadDir)
+      .filter((file) => file !== ".gitkeep")
+      .forEach((file) => fs.unlinkSync(path.join(uploadDir, file)));
+  }
 
   const owner = await User.create({ name: "Asif Tailor", username: "owner", password: "owner123", role: "owner" });
   const ali = await User.create({ name: "Ali Raza", username: "ali", password: "staff123", role: "staff" });
