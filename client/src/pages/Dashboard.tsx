@@ -80,7 +80,7 @@ function Dashboard() {
                   <tr>
                     <th className="px-4 py-2">Customer</th>
                     <th className="px-4 py-2">Garment</th>
-                    <th className="px-4 py-2">Staff</th>
+                    {user?.role === "owner" && <th className="px-4 py-2">Staff</th>}
                     <th className="px-4 py-2">Due date</th>
                     <th className="px-4 py-2">Status</th>
                   </tr>
@@ -94,7 +94,7 @@ function Dashboard() {
                           {order.garmentType}
                         </Link>
                       </td>
-                      <td className="px-4 py-3">{order.assignedTo.name}</td>
+                      {user?.role === "owner" && <td className="px-4 py-3">{order.assignedTo.name}</td>}
                       <td className="px-4 py-3">{new Date(order.dueDate).toLocaleDateString()}</td>
                       <td className="px-4 py-3">
                         <StatusBadge status={order.status} />
