@@ -100,6 +100,7 @@ function Orders() {
           <label className="mb-1 block text-xs text-slate-500">Status</label>
           <select className="input" value={status} onChange={(e) => setFilter("status", e.target.value)} disabled={overdue}>
             <option value="">All</option>
+            <option value="active">Active (not delivered)</option>
             {statuses.map((s) => (
               <option key={s}>{s}</option>
             ))}

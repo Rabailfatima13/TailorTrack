@@ -41,7 +41,12 @@ const getOrders = catchAsync(async (req, res) => {
     filter.assignedTo = staff;
   }
 
-  if (status) filter.status = status;
+  // "active" means every order that has not been delivered yet
+  if (status === "active") {
+    filter.status = { $ne: "Delivered" };
+  } else if (Order.STATUSES.includes(status)) {
+    filter.status = status;
+  }
   if (customer) {
     filter.customer = customer;
   } else if (search && search.trim()) {

@@ -53,7 +53,7 @@ function Dashboard() {
               label="Active orders"
               value={data.activeOrders}
               style="bg-powder-100 text-powder-600"
-              to="/orders"
+              to="/orders?status=active"
             />
             <StatCard
               label="Ready for pickup"
