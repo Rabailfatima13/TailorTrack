@@ -1,15 +1,24 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import api, { getErrorMessage } from "../api/axios";
 import { useAppSelector } from "../store";
 import StatusBadge from "../components/StatusBadge";
 import type { DashboardData } from "../types";
 
-function StatCard({ label, value, style }: { label: string; value: number; style: string }) {
+interface StatCardProps {
+  label: string;
+  value: number;
+  style: string;
+  to: string;
+}
+
+function StatCard({ label, value, style, to }: StatCardProps) {
   return (
-    <div className={`rounded-2xl p-5 shadow-sm ${style}`}>
+    <Link to={to} className={`block rounded-2xl p-5 shadow-sm transition hover:shadow-md ${style}`}>
       <p className="text-sm opacity-80">{label}</p>
       <p className="mt-1 text-3xl font-bold">{value}</p>
-    </div>
+      <p className="mt-2 text-xs opacity-70">View orders &rarr;</p>
+    </Link>
   );
 }
 
@@ -40,9 +49,24 @@ function Dashboard() {
       {data && (
         <>
           <div className="mt-6 grid gap-4 sm:grid-cols-3">
-            <StatCard label="Active orders" value={data.activeOrders} style="bg-powder-100 text-powder-600" />
-            <StatCard label="Ready for pickup" value={data.readyOrders} style="bg-blush-100 text-blush-600" />
-            <StatCard label="Overdue" value={data.overdueOrders} style="bg-red-50 text-red-500" />
+            <StatCard
+              label="Active orders"
+              value={data.activeOrders}
+              style="bg-powder-100 text-powder-600"
+              to="/orders"
+            />
+            <StatCard
+              label="Ready for pickup"
+              value={data.readyOrders}
+              style="bg-blush-100 text-blush-600"
+              to="/orders?status=Ready"
+            />
+            <StatCard
+              label="Overdue"
+              value={data.overdueOrders}
+              style="bg-red-50 text-red-500"
+              to="/orders?overdue=true"
+            />
           </div>
 
           <h2 className="mb-3 mt-8 text-lg font-semibold text-slate-700">Due in the next 7 days</h2>
@@ -65,7 +89,11 @@ function Dashboard() {
                   {data.upcoming.map((order) => (
                     <tr key={order._id} className="border-t border-blush-50 hover:bg-blush-50/50">
                       <td className="px-4 py-3">{order.customer.name}</td>
-                      <td className="px-4 py-3">{order.garmentType}</td>
+                      <td className="px-4 py-3">
+                        <Link to={`/orders/${order._id}`} className="text-powder-600 hover:underline">
+                          {order.garmentType}
+                        </Link>
+                      </td>
                       <td className="px-4 py-3">{order.assignedTo.name}</td>
                       <td className="px-4 py-3">{new Date(order.dueDate).toLocaleDateString()}</td>
                       <td className="px-4 py-3">
