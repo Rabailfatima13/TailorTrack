@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
 import api, { getErrorMessage } from "../api/axios";
 import StatusBadge from "../components/StatusBadge";
 import { useAppSelector } from "../store";
@@ -13,13 +13,16 @@ function Orders() {
   const location = useLocation();
   const [message] = useState(location.state?.message);
 
+  // Filters live in the URL so they survive a refresh and can be linked to
+  const [searchParams, setSearchParams] = useSearchParams();
+  const status = searchParams.get("status") || "";
+  const staff = searchParams.get("staff") || "";
+  const from = searchParams.get("from") || "";
+  const to = searchParams.get("to") || "";
+  const overdue = searchParams.get("overdue") === "true";
+
   const [orders, setOrders] = useState<Order[]>([]);
   const [staffList, setStaffList] = useState<User[]>([]);
-  const [status, setStatus] = useState("");
-  const [staff, setStaff] = useState("");
-  const [from, setFrom] = useState("");
-  const [to, setTo] = useState("");
-  const [overdue, setOverdue] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -43,12 +46,15 @@ function Orders() {
       .finally(() => setLoading(false));
   }, [status, staff, from, to, overdue]);
 
+  function setFilter(name: string, value: string) {
+    const params = new URLSearchParams(searchParams);
+    if (value) params.set(name, value);
+    else params.delete(name);
+    setSearchParams(params, { replace: true });
+  }
+
   function clearFilters() {
-    setStatus("");
-    setStaff("");
-    setFrom("");
-    setTo("");
-    setOverdue(false);
+    setSearchParams({}, { replace: true });
   }
 
   return (
@@ -67,7 +73,7 @@ function Orders() {
       <div className="card mb-5 flex flex-wrap items-end gap-4 p-4">
         <div>
           <label className="mb-1 block text-xs text-slate-500">Status</label>
-          <select className="input" value={status} onChange={(e) => setStatus(e.target.value)} disabled={overdue}>
+          <select className="input" value={status} onChange={(e) => setFilter("status", e.target.value)} disabled={overdue}>
             <option value="">All</option>
             {statuses.map((s) => (
               <option key={s}>{s}</option>
@@ -78,7 +84,7 @@ function Orders() {
         {isOwner && (
           <div>
             <label className="mb-1 block text-xs text-slate-500">Staff</label>
-            <select className="input" value={staff} onChange={(e) => setStaff(e.target.value)}>
+            <select className="input" value={staff} onChange={(e) => setFilter("staff", e.target.value)}>
               <option value="">All staff</option>
               {staffList.map((s) => (
                 <option key={s._id} value={s._id}>
@@ -91,18 +97,18 @@ function Orders() {
 
         <div>
           <label className="mb-1 block text-xs text-slate-500">Due from</label>
-          <input type="date" className="input" value={from} onChange={(e) => setFrom(e.target.value)} />
+          <input type="date" className="input" value={from} onChange={(e) => setFilter("from", e.target.value)} />
         </div>
         <div>
           <label className="mb-1 block text-xs text-slate-500">Due to</label>
-          <input type="date" className="input" value={to} onChange={(e) => setTo(e.target.value)} />
+          <input type="date" className="input" value={to} onChange={(e) => setFilter("to", e.target.value)} />
         </div>
 
         <label className="flex items-center gap-2 pb-2 text-sm text-slate-600">
           <input
             type="checkbox"
             checked={overdue}
-            onChange={(e) => setOverdue(e.target.checked)}
+            onChange={(e) => setFilter("overdue", e.target.checked ? "true" : "")}
             className="accent-blush-500"
           />
           Overdue only
