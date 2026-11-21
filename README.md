@@ -119,6 +119,17 @@ Open `http://localhost:5173` in the browser. Requests to `/api` are forwarded to
 | PUT | /api/users/staff/:id | owner |
 | GET | /api/users/staff/summary | owner |
 
+## Troubleshooting
+
+| Problem | What to do |
+|---------|------------|
+| `Could not connect to MongoDB` | MongoDB is not running or `MONGO_URI` is wrong. On Windows start it with `net start MongoDB`, then run the server again. |
+| `Missing environment variables: ...` | `server/.env` is missing or incomplete. Copy `server/.env.example` and fill in the values. In PowerShell use `Copy-Item .env.example .env` instead of `cp`. |
+| Login shows "Too many failed login attempts" | Wait 15 minutes or restart the server; the limit is kept in memory. |
+| The app opens but every request fails | The backend is not running. Start `server` first, then `client`. |
+| Demo accounts do not work | Run `npm run seed` in `server`. It clears the database and adds the sample data again. |
+| Port 5000 or 5173 is already in use | An old copy of the app is still running. Close that terminal and start again. |
+
 ## Security notes
 
 - Passwords are hashed with bcrypt and never returned by the API.
