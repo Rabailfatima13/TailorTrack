@@ -123,7 +123,6 @@ Open `http://localhost:5173` in the browser. Requests to `/api` are forwarded to
 
 | Problem | What to do |
 |---------|------------|
-| `Missing environment variables: ...` | `server/.env` is missing or incomplete. Copy `server/.env.example` and fill in the values. In PowerShell use `Copy-Item .env.example .env` instead of `cp`. |
 | Login shows "Too many failed login attempts" | Wait 15 minutes or restart the server; the limit is kept in memory. |
 | The app opens but every request fails | The backend is not running. Start `server` first, then `client`. |
 | Demo accounts do not work | Run `npm run seed` in `server`. It clears the database and adds the sample data again. |
