@@ -123,7 +123,6 @@ Open `http://localhost:5173` in the browser. Requests to `/api` are forwarded to
 
 | Problem | What to do |
 |---------|------------|
-| `Could not connect to MongoDB` | MongoDB is not running or `MONGO_URI` is wrong. On Windows start it with `net start MongoDB`, then run the server again. |
 | `Missing environment variables: ...` | `server/.env` is missing or incomplete. Copy `server/.env.example` and fill in the values. In PowerShell use `Copy-Item .env.example .env` instead of `cp`. |
 | Login shows "Too many failed login attempts" | Wait 15 minutes or restart the server; the limit is kept in memory. |
 | The app opens but every request fails | The backend is not running. Start `server` first, then `client`. |
